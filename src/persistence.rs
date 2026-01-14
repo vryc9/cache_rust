@@ -3,7 +3,6 @@ use std::io::{self, BufRead, BufReader, Write};
 use std::str::FromStr;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
-
 use crate::cache::{LruCache, Cache};
 
 impl<K, V> LruCache<K, V>
@@ -13,6 +12,10 @@ where
     <K as FromStr>::Err: Debug,
     <V as FromStr>::Err: Debug,
 {
+    /// Crée un cache et tente de charger son contenu depuis un fichier.
+    ///
+    /// Le fichier doit suivre le format `clé=valeur` (une entrée par ligne).
+    /// Si le fichier n'existe pas ou est corrompu, un cache vide est retourné (best-effort).
     pub fn new_persistent(capacity: usize, filepath: &str) -> io::Result<Self> {
         let mut cache = LruCache::new(capacity);
 
@@ -31,6 +34,11 @@ where
         Ok(cache)
     }
 
+    /// Sauvegarde l'état actuel du cache dans un fichier.
+    ///
+    /// L'ordre d'écriture se fait du **Tail (Vieux) vers Head (Récent)**.
+    /// Cela garantit que lors du rechargement, les éléments seront réinsérés
+    /// dans le bon ordre pour conserver leur statut de récence.
     pub fn save_to_file(&self, filepath: &str) -> io::Result<()> {
         let mut file = File::create(filepath)?;
         
@@ -40,7 +48,6 @@ where
             writeln!(file, "{}={}", node.key, node.value)?;
             current_idx = node.prev; 
         }
-        
         Ok(())
     }
 }
