@@ -97,12 +97,14 @@ where
         }
         let prev_idx = self.arena[index].prev;
         let next_idx = self.arena[index].next;
+        
         if let Some(prev) = prev_idx {
             self.arena[prev].next = next_idx;
         }
         if let Some(next) = next_idx {
             self.arena[next].prev = prev_idx;
         }
+
         if Some(index) == self.tail {
             self.tail = prev_idx;
         }
@@ -125,6 +127,8 @@ where
             } else {
                 self.head = None;
             }
+
+            self.arena.swap_remove(tail_idx);
 
             if tail_idx < self.arena.len() {
                 let moved_key = self.arena[tail_idx].key.clone();
