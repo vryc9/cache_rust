@@ -4,7 +4,6 @@ use std::str::FromStr;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-// On importe les définitions depuis le module parent
 use crate::cache::{LruCache, Cache};
 
 impl<K, V> LruCache<K, V>
@@ -39,7 +38,7 @@ where
         while let Some(idx) = current_idx {
             let node = &self.arena[idx];
             writeln!(file, "{}={}", node.key, node.value)?;
-            current_idx = node.prev; // On remonte vers le plus récent
+            current_idx = node.prev; 
         }
         
         Ok(())
